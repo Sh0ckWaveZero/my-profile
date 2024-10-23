@@ -14,14 +14,18 @@ RUN bun run build
 # Step 2: Create a smaller image for running the application
 FROM nginx:alpine
 
+WORKDIR /usr/share/nginx/
+
+RUN rm -rf html
+RUN mkdir html
+
+WORKDIR /
+
+# Copy custom Nginx configuration
+COPY nginx.conf /etc/nginx
+
 # Copy the built files from the builder image to the Nginx html directory
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy custom Nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
-
-# Expose the port the application will run on
-EXPOSE 3000
-
 # Start Nginx server
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
