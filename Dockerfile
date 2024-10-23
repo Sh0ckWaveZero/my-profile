@@ -12,18 +12,16 @@ RUN bun install
 RUN bun run build
 
 # Step 2: Create a smaller image for running the application
-FROM oven/bun
+FROM nginx:alpine
 
-# Set the working directory in the container
-WORKDIR /app
+# Copy the built files from the builder image to the Nginx html directory
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy only the necessary files from the builder image to the final image
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/bun.lockb ./bun.lockb
+# Copy custom Nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
 
 # Expose the port the application will run on
 EXPOSE 3000
 
-# Start the Bun server
-CMD ["bun", "run", "preview"]
+# Start Nginx server
+CMD ["nginx", "-g", "daemon off;"]
