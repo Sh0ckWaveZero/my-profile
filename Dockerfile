@@ -1,31 +1,53 @@
-# Step 1: Build the application
-FROM oven/bun AS builder
+FROM oven/bun:1-alpine AS base
 
-# Set the working directory in the container
+# Install dependencies only when needed
+FROM base AS deps
 WORKDIR /app
 
-# Copy all the application files to the container
+# Install dependencies based on the preferred package manager
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
+
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Install dependencies and run the build process
-RUN bun install
+# Next.js collects completely anonymous telemetry data about general usage.
+# Learn more here: https://nextjs.org/telemetry
+# Uncomment the following line in case you want to disable telemetry during the build.
+# ENV NEXT_TELEMETRY_DISABLED 1
+
 RUN bun run build
 
-# Step 2: Create a smaller image for running the application
-FROM nginx:alpine
+# Production image, copy all the files and run next
+FROM base AS runner
+WORKDIR /app
 
-WORKDIR /usr/share/nginx/
+ENV NODE_ENV production
+# Uncomment the following line to disable telemetry during runtime.
+# ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN rm -rf html
-RUN mkdir html
+RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
 
-WORKDIR /
+COPY --from=builder /app/public ./public
 
-# Copy custom Nginx configuration
-COPY nginx.conf /etc/nginx
+# Set the correct permission for prerender cache
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
 
-# Copy the built files from the builder image to the Nginx html directory
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Automatically leverage output traces to reduce image size
+# https://nextjs.org/docs/advanced-features/output-file-tracing
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Start Nginx server
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+USER nextjs
+
+EXPOSE 3000
+
+ENV PORT 3000
+
+# server.js is created by next build from the standalone output
+# https://nextjs.org/docs/pages/api-reference/next-config-js/output
+CMD ["bun", "server.js"]

@@ -1,15 +1,13 @@
 version: '3.8'
-name: midseelee
 
 services:
   app:
-    image: midseelee/svelte-app
-    container_name: midseelee
+    container_name: my-profile-app
     build:
       context: .
       dockerfile: Dockerfile
+    restart: always
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-    restart: always

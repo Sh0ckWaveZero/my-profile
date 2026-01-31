@@ -1,21 +1,36 @@
 {
   "name": "my-profile",
+  "version": "0.1.0",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "bunx --bun vite",
-    "build": "bunx --bun vite build",
-    "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json"
+    "dev": "next dev --turbo",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@mdx-js/loader": "latest",
+    "@mdx-js/react": "latest",
+    "@next/mdx": "latest",
+    "geist": "latest",
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-syntax-highlighter": "^16.1.0",
+    "rehype-highlight": "latest"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "4.0.2",
-    "@tsconfig/svelte": "^5.0.4",
-    "svelte": "5.1.11",
-    "svelte-check": "4.1.0",
-    "tslib": "2.8.1",
-    "typescript": "5.6.3",
-    "vite": "5.4.20"
+    "@tailwindcss/postcss": "^4.1.18",
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/mdx": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@types/react-syntax-highlighter": "^15.5.13",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "postcss": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest"
   }
 }
