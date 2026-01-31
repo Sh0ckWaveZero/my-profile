@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 oven/bun:1-alpine AS base
+FROM oven/bun:1-slim AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Install dependencies based on the preferred package manager
 COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -29,7 +29,7 @@ ENV NODE_ENV production
 # Uncomment the following line to disable telemetry during runtime.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
+RUN groupadd --system nodejs && useradd --system --gid nodejs nextjs
 
 COPY --from=builder /app/public ./public
 
