@@ -1,25 +1,30 @@
-# Dockerfile for Bun + Next.js on ARM64 (Raspberry Pi)
+# Dockerfile for Node.js + Next.js on ARM64 (Raspberry Pi)
 
 ###################
 # BUILD STAGE
 ###################
-FROM oven/bun:1-alpine AS build
+FROM node:24-bookworm-slim AS build
 
 WORKDIR /app
 
 # Install build dependencies
-RUN apk update && apk add --no-cache --virtual .build-deps \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
-    bash \
     ca-certificates \
-    build-base \
-    && rm -rf /var/cache/apk/*
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy dependency files
-COPY package.json bun.lock ./
+COPY package.json bun.lock* package-lock.json* ./
 
-# Install dependencies
-RUN bun install
+# Install dependencies (handle both npm and bun lock files)
+# Install ALL dependencies for build (including devDependencies)
+RUN if [ -f package-lock.json ]; then \
+        npm ci --legacy-peer-deps; \
+    else \
+        npm install --legacy-peer-deps; \
+    fi && \
+    npm cache clean --force
 
 # Copy source files
 COPY . .
@@ -28,25 +33,23 @@ COPY . .
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1
 
-RUN bun run build
+RUN npm run build
 
 # Cleanup
-RUN bun pm cache rm 2>/dev/null || true && \
-    rm -rf /root/.cache /tmp/* && \
-    rm -rf .next/cache && \
-    apk del .build-deps 2>/dev/null || true
+RUN rm -rf /root/.cache /tmp/* && \
+    rm -rf .next/cache
 
 ###################
 # RUNTIME STAGE
 ###################
-FROM oven/bun:1-alpine AS runner
+FROM node:24-bookworm-slim AS runner
 WORKDIR /app
 
 # Install runtime dependencies
-RUN apk update && apk add --no-cache \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
-    && rm -rf /var/cache/apk/* /tmp/*
+    && rm -rf /var/lib/apt/lists/* /tmp/*
 
 # Set production environment
 ENV NODE_ENV=production \
@@ -55,8 +58,8 @@ ENV NODE_ENV=production \
     HOSTNAME=0.0.0.0
 
 # Create non-root user
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid nodejs nextjs
 
 # Copy build output
 COPY --from=build /app/public ./public
@@ -69,4 +72,4 @@ USER nextjs
 
 EXPOSE 3000
 
-CMD ["bun", "server.js"]
+CMD ["node", "server.js"]
