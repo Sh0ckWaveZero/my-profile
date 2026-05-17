@@ -1,55 +1,14 @@
-"use client";
-import { cn } from "@/lib/utils";
-import { useEffect, useRef, useState } from "react";
-
-export const BackgroundGradient = ({
-  className,
-  containerClassName,
-  animate = true,
-}: {
-  className?: string;
-  containerClassName?: string;
-  animate?: boolean;
-}) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!animate) return;
-    const container = containerRef.current;
-    if (!container) return;
-
-    let animationFrameId: number;
-    let hue = 0;
-
-    const updateGradient = () => {
-      hue = (hue + 0.5) % 360;
-      container.style.setProperty("--hue", `${hue}deg`);
-      animationFrameId = requestAnimationFrame(updateGradient);
-    };
-
-    updateGradient();
-
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [animate]);
-
-  return (
+export const BackgroundGradient = () => (
+  <div
+    aria-hidden="true"
+    className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+  >
     <div
-      ref={containerRef}
-      className={cn(
-        "relative w-full h-full overflow-hidden bg-background",
-        containerClassName
-      )}
-    >
-      <div
-        className={cn(
-          "absolute inset-0 opacity-30 blur-[100px]",
-          "bg-[radial-gradient(circle_at_50%_50%,hsl(var(--hue)_80%_60%),transparent_70%)]",
-          "transition-all duration-1000 ease-in-out",
-          className
-        )}
-        style={{ "--hue": "0deg" } as React.CSSProperties}
-      />
-      <div className="absolute inset-0 bg-background/90" />
-    </div>
-  );
-};
+      className="absolute -top-32 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full blur-[140px] opacity-[0.06]"
+      style={{
+        background:
+          "radial-gradient(ellipse at center, oklch(0.55 0.15 255), oklch(0.45 0.1 285))",
+      }}
+    />
+  </div>
+);
