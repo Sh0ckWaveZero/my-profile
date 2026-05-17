@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -16,4 +17,88 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ── Home hero ─────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes typewriter {
+    from { clip-path: inset(0 100% 0 0); }
+    to   { clip-path: inset(0 0% 0 0); }
+  }
+  .hero-prompt {
+    white-space: nowrap;
+    animation: typewriter 0.45s steps(8, end) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-prompt { opacity: 1; }
+}
+
+/* ── Conference theme ──────────────────────────────────────── */
+
+@keyframes crt-on {
+  0%   { opacity: 0;   filter: brightness(5) saturate(0) contrast(1.5); }
+  6%   { opacity: 1;   filter: brightness(0.2) saturate(0) contrast(1); }
+  30%  { opacity: 1;   filter: brightness(1.12) saturate(0.4) contrast(1); }
+  100% { opacity: 1;   filter: brightness(1) saturate(1) contrast(1); }
+}
+
+.conf-crt-on {
+  animation: crt-on 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .conf-crt-on { animation: none; opacity: 1; }
+}
+
+.conf-scanlines {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    oklch(0 0 0 / 0.032) 2px,
+    oklch(0 0 0 / 0.032) 4px
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .conf-scanlines { display: none; }
+}
+
+.conf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid oklch(0.72 0.17 75 / 0.45);
+  color: oklch(0.72 0.17 75);
+  background: transparent;
+  transition: background 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.conf-btn:hover {
+  background: oklch(0.72 0.17 75);
+  color: oklch(0.09 0.01 65);
+  border-color: oklch(0.72 0.17 75);
+}
+
+.conf-btn-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: oklch(0.09 0.01 65);
+  color: oklch(0.72 0.17 75);
+  border: 1px solid oklch(0.09 0.01 65 / 0.5);
+  transition: background 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.conf-btn-dark:hover {
+  background: oklch(0.06 0.008 65);
 }

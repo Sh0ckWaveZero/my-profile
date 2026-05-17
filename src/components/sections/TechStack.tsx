@@ -1,73 +1,113 @@
 "use client";
 import { motion } from "framer-motion";
 
-const skills = [
-  { category: "Frontend", color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20", items: ["React", "Next.js", "Angular", "TailwindCSS", "Framer Motion", "Three.js"] },
-  { category: "Backend", color: "text-green-400", bg: "bg-green-500/10", border: "border-green-500/20", items: ["Node.js", "NestJS", "Express", "Python", "Go", "Docker"] },
-  { category: "Database", color: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/20", items: ["PostgreSQL", "MongoDB", "Prisma", "Redis", "Supabase"] },
-  { category: "Mobile & Tools", color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20", items: ["Flutter", "React Native", "Git", "Figma", "Vercel"] },
+const stacks = [
+  {
+    code: "[FE]",
+    label: "Frontend",
+    color: "oklch(0.65 0.14 185)",
+    skills: ["TypeScript", "React 19", "Next.js", "TanStack Start", "TanStack Router", "Tailwind CSS", "Framer Motion"],
+  },
+  {
+    code: "[BE]",
+    label: "Backend",
+    color: "oklch(0.62 0.12 160)",
+    skills: ["Go", "Bun", "Node.js", "Prisma", "PostgreSQL", "Supabase", "tRPC"],
+  },
+  {
+    code: "[SYS]",
+    label: "Systems",
+    color: "oklch(0.60 0.10 60)",
+    skills: ["Rust", "Zig", "C++", "ESP32", "BLE", "UART"],
+  },
+  {
+    code: "[AI]",
+    label: "AI / Automation",
+    color: "oklch(0.58 0.10 290)",
+    skills: ["Claude API", "Agent Skills", "MCP", "Prompt Engineering", "Cronjob Automation"],
+  },
+  {
+    code: "[OPS]",
+    label: "Infra / Tooling",
+    color: "oklch(0.52 0.06 220)",
+    skills: ["Docker", "GitHub Actions", "MinIO", "Supabase Storage", "Vercel", "Linux"],
+  },
 ];
 
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2
-    }
-  }
-};
-
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 }
-};
+const ease = [0.16, 1, 0.3, 1] as const;
 
 export function TechStack() {
   return (
-    <section className="relative z-10 w-full max-w-6xl mx-auto px-4 py-20">
+    <section id="stack" className="w-full max-w-6xl mx-auto px-8 md:px-12 py-16">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="text-center mb-16"
+        transition={{ duration: 0.4, ease }}
+        className="mb-10"
+        style={{ borderTop: "1px solid oklch(0.20 0.01 200 / 0.5)", paddingTop: "3rem" }}
       >
-        <h2 className="text-3xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-100 to-gray-500 mb-4">
+        <p
+          style={{
+            fontFamily: "var(--font-geist-mono)",
+            fontSize: "0.7rem",
+            color: "oklch(0.40 0.09 185)",
+            letterSpacing: "0.12em",
+            marginBottom: "0.5rem",
+          }}
+        >
+          {"> stack"}
+        </p>
+        <h2
+          style={{
+            fontFamily: "var(--font-sg)",
+            fontSize: "clamp(1.1rem, 2.5vw, 1.4rem)",
+            fontWeight: 700,
+            color: "oklch(0.82 0.008 75)",
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+          }}
+        >
           Technologies
         </h2>
-        <p className="text-gray-400 max-w-2xl mx-auto">
-          The arsenal I use to craft digital experiences.
-        </p>
       </motion.div>
 
-      <motion.div 
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, margin: "-100px" }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-      >
-        {skills.map((skill, idx) => (
+      <div>
+        {stacks.map((stack, idx) => (
           <motion.div
-            key={idx}
-            variants={item}
-            whileHover={{ y: -5 }}
-            className="p-6 rounded-2xl bg-white/[0.03] border border-white/[0.05] backdrop-blur-sm hover:bg-white/[0.06] hover:border-white/10 transition-all duration-300"
+            key={stack.code}
+            initial={{ opacity: 0, x: -10 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.38, delay: idx * 0.05, ease }}
+            className="flex flex-col sm:flex-row sm:items-baseline gap-3 sm:gap-8 py-4"
+            style={{ borderBottom: "1px solid oklch(0.16 0.01 200 / 0.5)" }}
           >
-            <h3 className={`text-lg font-semibold mb-4 ${skill.color}`}>{skill.category}</h3>
-            <div className="flex flex-wrap gap-2">
-              {skill.items.map((tech) => (
-                <span 
-                    key={tech} 
-                    className={`px-2.5 py-1 rounded-md text-xs font-medium border bg-opacity-20 ${skill.color} ${skill.bg} ${skill.border}`}
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
+            <span
+              style={{
+                fontFamily: "var(--font-geist-mono)",
+                fontSize: "0.7rem",
+                color: stack.color,
+                letterSpacing: "0.1em",
+                minWidth: "3.75rem",
+                flexShrink: 0,
+              }}
+            >
+              {stack.code}
+            </span>
+            <p
+              style={{
+                fontFamily: "var(--font-geist-mono)",
+                fontSize: "0.78rem",
+                color: "oklch(0.52 0.012 200)",
+                lineHeight: 1.7,
+              }}
+            >
+              {stack.skills.join(" · ")}
+            </p>
           </motion.div>
         ))}
-      </motion.div>
+      </div>
     </section>
   );
 }
