@@ -1,6 +1,7 @@
 services:
   app:
     container_name: my-profile-app
+    image: my-profile:latest
     platform: linux/arm64
     build:
       context: .
