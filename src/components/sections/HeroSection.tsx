@@ -1,10 +1,7 @@
-"use client";
-import { motion } from "framer-motion";
 import { FileText } from "lucide-react";
 import Link from "next/link";
-
-const MotionLink = motion.create(Link);
-const ease = [0.16, 1, 0.3, 1] as const;
+import { HudClock } from "@/components/HudClock";
+import type { GitHubUser } from "@/lib/github";
 
 const GithubIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -12,189 +9,167 @@ const GithubIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const INFO_ROWS: { key: string; val: string; highlight?: true }[] = [
-  { key: "USER", val: "MidSeeLee" },
-  { key: "HANDLE", val: "@Sh0ckWaveZero" },
-  { key: "ROLE", val: "Full Stack Developer" },
-  { key: "LOC", val: "Bangkok, TH" },
-  { key: "CO.", val: "MEDcury" },
-  { key: "STATUS", val: "◉ OPEN", highlight: true },
-];
+export function HeroSection({ user }: { user: GitHubUser | null }) {
+  const infoRows: { key: string; val: string; highlight?: true }[] = [
+    { key: "USER", val: user?.name ?? "MidSeeLee" },
+    { key: "HANDLE", val: user ? `@${user.login}` : "@Sh0ckWaveZero" },
+    { key: "ROLE", val: user?.bio?.trim() || "Full Stack Developer" },
+    { key: "LOC", val: user?.location ?? "Bangkok, TH" },
+    { key: "CO.", val: user?.company ?? "MEDcury" },
+    { key: "STATUS", val: "◉ OPEN", highlight: true },
+  ];
 
-export function HeroSection({
-  initialStats,
-}: {
-  initialStats: { public_repos: number; followers: number } | null;
-}) {
-  const repos = initialStats?.public_repos ?? 148;
+  const repos = user ? String(user.public_repos) : "—";
+  const followers = user ? String(user.followers) : "—";
+  const joinYear = user?.created_at ? new Date(user.created_at).getFullYear() : 2015;
 
   return (
-    <section id="hero" className="w-full max-w-6xl mx-auto px-8 md:px-12 pt-24 pb-20">
-      {/* Prompt — CSS typewriter, no Framer Motion needed */}
-      <p
-        className="hero-prompt"
+    <section id="hero" className="flex min-h-[92dvh] w-full flex-col">
+      {/* Telemetry strip */}
+      <div
+        className="hud-fade mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-8 pt-6 pb-4 md:px-12"
         style={{
           fontFamily: "var(--font-geist-mono)",
-          fontSize: "0.7rem",
-          color: "oklch(0.40 0.09 185)",
-          letterSpacing: "0.12em",
-          marginBottom: "1.75rem",
+          borderBottom: "1px solid var(--hud-line-soft)",
         }}
       >
-        {"> whoami"}
-      </p>
+        <span
+          className="hidden min-[420px]:block"
+          style={{ fontSize: "0.75rem", letterSpacing: "0.16em", color: "var(--hud-ink-3)" }}
+        >
+          SYS://SH0CKWAVEZERO
+        </span>
+        <span
+          className="hidden sm:block"
+          style={{ fontSize: "0.75rem", letterSpacing: "0.16em", color: "var(--hud-ink-3)" }}
+        >
+          13.7563°N 100.5018°E
+        </span>
+        <HudClock />
+      </div>
 
-      <div className="flex flex-col md:flex-row items-start gap-12 md:gap-16">
-        {/* Left: name + role + CTAs */}
-        <div className="flex-1 min-w-0">
-          <h1
+      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center gap-14 px-8 py-20 md:flex-row md:items-end md:gap-16 md:px-12">
+        {/* Identity */}
+        <div className="min-w-0 flex-1">
+          <p
+            className="hero-prompt"
             style={{
               fontFamily: "var(--font-geist-mono)",
-              fontSize: "clamp(3rem, 10vw, 7rem)",
+              fontSize: "0.75rem",
+              color: "var(--hud-phosphor-dim)",
+              letterSpacing: "0.12em",
+              marginBottom: "1.5rem",
+            }}
+          >
+            {"> whoami"}
+          </p>
+
+          <h1
+            style={{
+              fontFamily: "var(--font-display)",
+              fontSize: "clamp(3.25rem, 12vw, 9.5rem)",
               fontWeight: 700,
-              color: "oklch(0.65 0.14 185)",
-              letterSpacing: "-0.03em",
-              lineHeight: "0.88",
+              color: "var(--hud-phosphor)",
+              letterSpacing: "-0.01em",
+              lineHeight: 0.92,
               textTransform: "uppercase",
+              overflowWrap: "anywhere",
+              minWidth: 0,
             }}
           >
             {(["SH0CK", "WAVE", "ZERO"] as const).map((word, i) => (
-              <motion.span
+              <span
                 key={word}
-                initial={{ opacity: 0, x: -16, filter: "brightness(3) blur(2px)" }}
-                animate={{ opacity: 1, x: 0, filter: "brightness(1) blur(0px)" }}
-                transition={{
-                  duration: 0.55,
-                  delay: 0.28 + i * 0.14,
-                  ease,
-                  filter: { duration: 0.35, delay: 0.28 + i * 0.14, ease: "easeOut" },
-                }}
-                style={{ display: "block" }}
+                className="hud-boot"
+                style={{ display: "block", "--i": i } as React.CSSProperties}
               >
                 {word}
-              </motion.span>
+              </span>
             ))}
           </h1>
 
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.75, ease }}
-            style={{
-              marginTop: "1.5rem",
-              borderTop: "1px solid oklch(0.25 0.06 185 / 0.3)",
-              paddingTop: "1rem",
-            }}
+          <div
+            className="hud-rise"
+            style={
+              {
+                marginTop: "1.75rem",
+                borderTop: "1px solid var(--hud-line)",
+                paddingTop: "1.1rem",
+                "--d": "0.65s",
+              } as React.CSSProperties
+            }
           >
             <p
               style={{
-                fontFamily: "var(--font-sg)",
-                fontSize: "clamp(0.9rem, 2.2vw, 1.2rem)",
-                color: "oklch(0.68 0.015 200)",
-                letterSpacing: "0.08em",
+                fontFamily: "var(--font-display)",
+                fontSize: "clamp(0.95rem, 2.2vw, 1.3rem)",
+                color: "var(--hud-ink)",
+                letterSpacing: "0.1em",
                 textTransform: "uppercase",
                 fontWeight: 600,
               }}
             >
               Full Stack Developer
             </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.92, ease }}
-            className="flex items-center flex-wrap gap-3 mt-8"
-          >
-            <MotionLink
-              href="/blog"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.12 }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs uppercase tracking-widest"
+            <p
               style={{
                 fontFamily: "var(--font-geist-mono)",
-                border: "1px solid oklch(0.65 0.14 185 / 0.5)",
-                color: "oklch(0.65 0.14 185)",
-                background: "transparent",
-                transition: "background 0.15s ease, color 0.15s ease",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "oklch(0.65 0.14 185)";
-                (e.currentTarget as HTMLElement).style.color = "oklch(0.08 0.008 210)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.background = "transparent";
-                (e.currentTarget as HTMLElement).style.color = "oklch(0.65 0.14 185)";
+                fontSize: "0.75rem",
+                color: "var(--hud-ink-3)",
+                letterSpacing: "0.14em",
+                marginTop: "0.55rem",
               }}
             >
-              <FileText size={12} />
-              /blog
-            </MotionLink>
+              BKK · UTC+7 · SINCE {joinYear}
+            </p>
+          </div>
 
-            <motion.a
+          <div
+            className="hud-rise mt-9 flex flex-wrap items-center gap-3"
+            style={{ "--d": "0.8s" } as React.CSSProperties}
+          >
+            <Link href="/blog" className="hud-btn">
+              <FileText size={12} aria-hidden />
+              /blog
+            </Link>
+            <a
               href="https://github.com/Sh0ckWaveZero"
               target="_blank"
               rel="noopener noreferrer"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.12 }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-xs uppercase tracking-widest"
-              style={{
-                fontFamily: "var(--font-geist-mono)",
-                border: "1px solid oklch(0.28 0.01 200 / 0.6)",
-                color: "oklch(0.52 0.015 200)",
-                background: "transparent",
-                transition: "border-color 0.15s ease, color 0.15s ease",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.color = "oklch(0.78 0.012 200)";
-                (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.52 0.015 200 / 0.8)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.color = "oklch(0.52 0.015 200)";
-                (e.currentTarget as HTMLElement).style.borderColor = "oklch(0.28 0.01 200 / 0.6)";
-              }}
+              className="hud-btn hud-btn--ghost"
             >
-              <GithubIcon className="w-3 h-3" />
+              <GithubIcon className="h-3 w-3" />
               github ↗
-            </motion.a>
-          </motion.div>
+            </a>
+          </div>
         </div>
 
-        {/* Right: system info panel */}
-        <motion.aside
-          initial={{ opacity: 0, x: 16 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.45, ease }}
-          className="w-full md:w-64 shrink-0"
-          style={{
-            fontFamily: "var(--font-geist-mono)",
-            border: "1px solid oklch(0.20 0.01 200 / 0.55)",
-            padding: "1.125rem 1.25rem",
-          }}
+        {/* System readout — live from GitHub profile */}
+        <aside
+          className="hud-slide hud-panel w-full shrink-0 md:w-72"
+          style={{ fontFamily: "var(--font-geist-mono)", padding: "1.25rem 1.35rem" }}
         >
           <p
             style={{
-              fontSize: "0.58rem",
-              color: "oklch(0.32 0.01 200)",
-              letterSpacing: "0.15em",
+              fontSize: "0.75rem",
+              color: "var(--hud-ink-3)",
+              letterSpacing: "0.18em",
               textTransform: "uppercase",
-              marginBottom: "0.875rem",
-              paddingBottom: "0.625rem",
-              borderBottom: "1px solid oklch(0.18 0.01 200 / 0.5)",
+              marginBottom: "1rem",
+              paddingBottom: "0.7rem",
+              borderBottom: "1px solid var(--hud-line-soft)",
             }}
           >
             SYSTEM INFO
           </p>
 
           <div className="space-y-2">
-            {INFO_ROWS.map(({ key, val, highlight }) => (
+            {infoRows.map(({ key, val, highlight }) => (
               <div key={key} className="flex items-start gap-3">
                 <span
                   style={{
-                    fontSize: "0.58rem",
-                    color: "oklch(0.30 0.01 200)",
+                    fontSize: "0.75rem",
+                    color: "var(--hud-ink-3)",
                     letterSpacing: "0.1em",
                     minWidth: "3.75rem",
                     paddingTop: "0.06rem",
@@ -205,10 +180,8 @@ export function HeroSection({
                 </span>
                 <span
                   style={{
-                    fontSize: "0.68rem",
-                    color: highlight
-                      ? "oklch(0.65 0.14 185)"
-                      : "oklch(0.70 0.012 200)",
+                    fontSize: "0.75rem",
+                    color: highlight ? "var(--hud-signal)" : "var(--hud-ink-2)",
                     letterSpacing: "0.02em",
                   }}
                 >
@@ -220,22 +193,28 @@ export function HeroSection({
 
           <div
             style={{
-              marginTop: "0.875rem",
-              paddingTop: "0.625rem",
-              borderTop: "1px solid oklch(0.18 0.01 200 / 0.4)",
+              marginTop: "1rem",
+              paddingTop: "0.7rem",
+              borderTop: "1px solid var(--hud-line-soft)",
+              display: "flex",
+              justifyContent: "space-between",
+              gap: "1rem",
+              fontVariantNumeric: "tabular-nums",
             }}
           >
-            <p
-              style={{
-                fontSize: "0.58rem",
-                color: "oklch(0.28 0.01 200)",
-                letterSpacing: "0.08em",
-              }}
-            >
-              {repos} repos · since 2015
-            </p>
+            <span style={{ fontSize: "0.75rem", color: "var(--hud-ink-3)", letterSpacing: "0.1em" }}>
+              REPOS {repos}
+            </span>
+            <span style={{ fontSize: "0.75rem", color: "var(--hud-ink-3)", letterSpacing: "0.1em" }}>
+              FOLLOWERS {followers}
+            </span>
           </div>
-        </motion.aside>
+        </aside>
+      </div>
+
+      {/* Fold divider */}
+      <div className="mx-auto w-full max-w-6xl px-8 pb-5 md:px-12">
+        <div style={{ borderBottom: "2px solid var(--hud-line)" }} />
       </div>
     </section>
   );
