@@ -1,17 +1,25 @@
-"use client";
-import { motion } from "framer-motion";
+import type { GitHubRepo } from "@/lib/github";
+import { selectTopRepos } from "@/lib/github";
 
-const projects = [
+type ProjectRow = {
+  name: string;
+  url: string;
+  desc: string;
+  tags: string[];
+  stars: number;
+};
+
+/* Curated snapshot of real repos — the fallback when the GitHub API
+   is unreachable at request time. */
+const FALLBACK_ROWS: ProjectRow[] = [
   {
-    id: "001",
     name: "nktc-app",
     url: "https://github.com/Sh0ckWaveZero/nktc-app",
-    desc: "College student support system — attendance tracking, role-based access, file storage",
+    desc: "College student support system: attendance tracking, role-based access, file storage",
     tags: ["Next.js", "TypeScript", "Prisma", "PostgreSQL", "Supabase", "MUI v5"],
     stars: 6,
   },
   {
-    id: "002",
     name: "bun-line-t3",
     url: "https://github.com/Sh0ckWaveZero/bun-line-t3",
     desc: "LINE bot platform with attendance management, crypto tracking, and air quality monitoring",
@@ -19,109 +27,107 @@ const projects = [
     stars: 1,
   },
   {
-    id: "003",
     name: "esp32-claude-buddy",
     url: "https://github.com/Sh0ckWaveZero/esp32-claude-buddy",
-    desc: "ESP32 hardware agent wired to Claude API — embedded AI on a microcontroller",
+    desc: "ESP32 hardware agent wired to Claude API: embedded AI on a microcontroller",
     tags: ["C++", "ESP32", "Claude API", "IoT"],
     stars: 0,
   },
 ];
 
-const ease = [0.16, 1, 0.3, 1] as const;
+function toRow(repo: GitHubRepo): ProjectRow {
+  const tags = [repo.language, ...(repo.topics ?? [])]
+    .filter((tag): tag is string => Boolean(tag))
+    .slice(0, 4);
+  return {
+    name: repo.name,
+    url: repo.html_url,
+    desc: repo.description ?? "No description yet",
+    tags,
+    stars: repo.stargazers_count,
+  };
+}
 
-export function Projects() {
+export function Projects({ repos = [] }: { repos?: GitHubRepo[] }) {
+  const liveRows = selectTopRepos(repos).map(toRow);
+  const rows = liveRows.length > 0 ? liveRows : FALLBACK_ROWS;
+
   return (
-    <section id="projects" className="w-full max-w-6xl mx-auto px-8 md:px-12 pb-16">
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.4, ease }}
-        className="mb-10"
-        style={{ borderTop: "1px solid oklch(0.20 0.01 200 / 0.5)", paddingTop: "3rem" }}
-      >
+    <section id="projects" className="mx-auto w-full max-w-6xl px-8 pb-20 md:px-12">
+      <header className="mb-8" style={{ borderTop: "1px solid var(--hud-line)", paddingTop: "2.5rem" }}>
         <p
           style={{
             fontFamily: "var(--font-geist-mono)",
-            fontSize: "0.7rem",
-            color: "oklch(0.40 0.09 185)",
+            fontSize: "0.75rem",
+            color: "var(--hud-phosphor-dim)",
             letterSpacing: "0.12em",
-            marginBottom: "0.5rem",
+            marginBottom: "0.6rem",
           }}
         >
           {"> projects"}
         </p>
         <h2
           style={{
-            fontFamily: "var(--font-sg)",
-            fontSize: "clamp(1.1rem, 2.5vw, 1.4rem)",
-            fontWeight: 700,
-            color: "oklch(0.82 0.008 75)",
-            letterSpacing: "0.04em",
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(1.2rem, 2.6vw, 1.5rem)",
+            fontWeight: 600,
+            color: "var(--hud-ink)",
+            letterSpacing: "0.08em",
             textTransform: "uppercase",
           }}
         >
           Selected Work
         </h2>
-      </motion.div>
+      </header>
 
       <div>
-        {projects.map((project, idx) => (
-          <motion.a
-            key={project.id}
+        {rows.map((project, idx) => (
+          <a
+            key={project.url}
             href={project.url}
             target="_blank"
             rel="noopener noreferrer"
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.38, delay: idx * 0.07, ease }}
-            className="flex items-start gap-6 md:gap-10 py-6 group"
+            className="hud-row group flex items-start gap-6 border-b py-7 md:gap-10"
             style={{
-              borderBottom: "1px solid oklch(0.16 0.01 200 / 0.5)",
+              borderColor: "var(--hud-line-soft)",
               textDecoration: "none",
             }}
           >
-            {/* Index */}
             <span
+              className="hud-idx"
               style={{
                 fontFamily: "var(--font-geist-mono)",
-                fontSize: "0.68rem",
-                color: "oklch(0.25 0.008 200)",
+                fontSize: "0.75rem",
+                color: "var(--hud-ink-3)",
                 letterSpacing: "0.08em",
                 minWidth: "2.25rem",
-                paddingTop: "0.15rem",
+                paddingTop: "0.25rem",
                 flexShrink: 0,
-                transition: "color 0.15s ease",
               }}
-              className="group-hover:!text-[oklch(0.40_0.09_185)]"
             >
-              {project.id}
+              {String(idx + 1).padStart(3, "0")}
             </span>
 
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1 mb-2">
-                <p
+            <div className="min-w-0 flex-1">
+              <div className="mb-1.5 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+                <span
+                  className="hud-name"
                   style={{
-                    fontFamily: "var(--font-geist-mono)",
-                    fontSize: "0.95rem",
+                    fontFamily: "var(--font-display)",
+                    fontSize: "1.05rem",
                     fontWeight: 600,
-                    color: "oklch(0.78 0.010 200)",
-                    letterSpacing: "0.02em",
-                    transition: "color 0.15s ease",
+                    color: "var(--hud-ink-2)",
+                    letterSpacing: "0.04em",
                   }}
-                  className="group-hover:!text-[oklch(0.88_0.005_75)]"
                 >
                   {project.name}
-                </p>
+                </span>
                 {project.stars > 0 && (
                   <span
                     style={{
                       fontFamily: "var(--font-geist-mono)",
-                      fontSize: "0.6rem",
-                      color: "oklch(0.40 0.09 185)",
+                      fontSize: "0.75rem",
+                      color: "var(--hud-phosphor-dim)",
                       letterSpacing: "0.1em",
                       flexShrink: 0,
                     }}
@@ -134,49 +140,49 @@ export function Projects() {
                 style={{
                   fontFamily: "var(--font-geist-sans)",
                   fontSize: "0.8rem",
-                  color: "oklch(0.42 0.01 200)",
-                  lineHeight: 1.55,
-                  marginBottom: "0.75rem",
-                  maxWidth: "55ch",
+                  color: "var(--hud-ink-3)",
+                  lineHeight: 1.6,
+                  marginBottom: "0.85rem",
+                  maxWidth: "58ch",
                 }}
               >
                 {project.desc}
               </p>
-              <div className="flex flex-wrap gap-1.5">
-                {project.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    style={{
-                      fontFamily: "var(--font-geist-mono)",
-                      fontSize: "0.6rem",
-                      color: "oklch(0.38 0.01 200)",
-                      letterSpacing: "0.06em",
-                      padding: "0.2rem 0.55rem",
-                      border: "1px solid oklch(0.20 0.01 200 / 0.55)",
-                      background: "oklch(0.11 0.008 210 / 0.6)",
-                    }}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
+              {project.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {project.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      style={{
+                        fontFamily: "var(--font-geist-mono)",
+                        fontSize: "0.75rem",
+                        color: "var(--hud-ink-3)",
+                        letterSpacing: "0.06em",
+                        padding: "0.22rem 0.6rem",
+                        border: "1px solid var(--hud-line-soft)",
+                        background: "var(--hud-panel)",
+                      }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Arrow */}
             <span
+              className="hud-arrow hidden sm:block"
               style={{
                 fontFamily: "var(--font-geist-mono)",
                 fontSize: "0.75rem",
-                color: "oklch(0.22 0.008 200)",
-                paddingTop: "0.1rem",
+                color: "var(--hud-ink-3)",
+                paddingTop: "0.15rem",
                 flexShrink: 0,
-                transition: "color 0.15s ease, transform 0.15s ease",
               }}
-              className="group-hover:!text-[oklch(0.65_0.14_185)] group-hover:translate-x-0.5 hidden sm:block"
             >
               ↗
             </span>
-          </motion.a>
+          </a>
         ))}
       </div>
     </section>

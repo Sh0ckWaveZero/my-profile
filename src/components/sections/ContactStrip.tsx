@@ -1,67 +1,62 @@
-"use client";
-import { motion } from "framer-motion";
-
-const ease = [0.16, 1, 0.3, 1] as const;
-
-export function ContactStrip() {
+export function ContactStrip({ blog = null }: { blog?: string | null }) {
   return (
-    <section id="contact" className="w-full max-w-6xl mx-auto px-8 md:px-12 pb-20">
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.4, ease }}
-        style={{ borderTop: "1px solid oklch(0.20 0.01 200 / 0.5)", paddingTop: "3rem" }}
-      >
+    <section id="contact" className="mx-auto w-full max-w-6xl px-8 pb-24 md:px-12">
+      <div style={{ borderTop: "1px solid var(--hud-line)", paddingTop: "2.5rem" }}>
         <p
           style={{
             fontFamily: "var(--font-geist-mono)",
-            fontSize: "0.7rem",
-            color: "oklch(0.40 0.09 185)",
+            fontSize: "0.75rem",
+            color: "var(--hud-phosphor-dim)",
             letterSpacing: "0.12em",
-            marginBottom: "2rem",
+            marginBottom: "1.75rem",
           }}
         >
           {"> contact"}
         </p>
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          <a
-            href="https://github.com/Sh0ckWaveZero"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              fontFamily: "var(--font-geist-mono)",
-              fontSize: "0.8rem",
-              color: "oklch(0.52 0.015 200)",
-              letterSpacing: "0.03em",
-              textDecoration: "none",
-              transition: "color 0.15s ease",
-            }}
-            onMouseEnter={(e) =>
-              ((e.currentTarget as HTMLElement).style.color = "oklch(0.78 0.012 200)")
-            }
-            onMouseLeave={(e) =>
-              ((e.currentTarget as HTMLElement).style.color = "oklch(0.52 0.015 200)")
-            }
-          >
-            github.com/Sh0ckWaveZero ↗
-          </a>
+        <a
+          href="https://github.com/Sh0ckWaveZero"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hud-link-xl"
+        >
+          github.com/Sh0ckWaveZero
+          <span className="hud-arrow-xl" aria-hidden="true">
+            ↗
+          </span>
+        </a>
 
+        <div className="mt-12 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <span
+              style={{
+                fontFamily: "var(--font-geist-mono)",
+                fontSize: "0.75rem",
+                color: "var(--hud-ink-3)",
+                letterSpacing: "0.16em",
+              }}
+            >
+              CHAN://GITHUB
+            </span>
+            {blog && (
+              <a href={blog} target="_blank" rel="noopener noreferrer" className="hud-channel">
+                {blog.replace(/^https?:\/\//, "")} ↗
+              </a>
+            )}
+          </div>
           <span
             style={{
               fontFamily: "var(--font-geist-mono)",
-              fontSize: "0.65rem",
-              color: "oklch(0.65 0.14 185)",
-              letterSpacing: "0.12em",
+              fontSize: "0.75rem",
+              color: "var(--hud-signal)",
+              letterSpacing: "0.14em",
               textTransform: "uppercase",
-              flexShrink: 0,
             }}
           >
             ◉ OPEN TO CONTRACTS
           </span>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 }

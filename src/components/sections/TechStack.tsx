@@ -1,113 +1,116 @@
-"use client";
-import { motion } from "framer-motion";
-
 const stacks = [
   {
     code: "[FE]",
     label: "Frontend",
-    color: "oklch(0.65 0.14 185)",
     skills: ["TypeScript", "React 19", "Next.js", "TanStack Start", "TanStack Router", "Tailwind CSS", "Framer Motion"],
   },
   {
     code: "[BE]",
     label: "Backend",
-    color: "oklch(0.62 0.12 160)",
     skills: ["Go", "Bun", "Node.js", "Prisma", "PostgreSQL", "Supabase", "tRPC"],
   },
   {
     code: "[SYS]",
     label: "Systems",
-    color: "oklch(0.60 0.10 60)",
     skills: ["Rust", "Zig", "C++", "ESP32", "BLE", "UART"],
   },
   {
     code: "[AI]",
     label: "AI / Automation",
-    color: "oklch(0.58 0.10 290)",
     skills: ["Claude API", "Agent Skills", "MCP", "Prompt Engineering", "Cronjob Automation"],
   },
   {
     code: "[OPS]",
     label: "Infra / Tooling",
-    color: "oklch(0.52 0.06 220)",
     skills: ["Docker", "GitHub Actions", "MinIO", "Supabase Storage", "Vercel", "Linux"],
   },
 ];
 
-const ease = [0.16, 1, 0.3, 1] as const;
-
-export function TechStack() {
+export function TechStack({ langStats = [] }: { langStats?: string[] }) {
   return (
-    <section id="stack" className="w-full max-w-6xl mx-auto px-8 md:px-12 py-16">
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.4, ease }}
-        className="mb-10"
-        style={{ borderTop: "1px solid oklch(0.20 0.01 200 / 0.5)", paddingTop: "3rem" }}
-      >
+    <section id="stack" className="mx-auto w-full max-w-6xl px-8 py-20 md:px-12">
+      <header className="mb-10" style={{ borderTop: "1px solid var(--hud-line)", paddingTop: "2.5rem" }}>
         <p
           style={{
             fontFamily: "var(--font-geist-mono)",
-            fontSize: "0.7rem",
-            color: "oklch(0.40 0.09 185)",
+            fontSize: "0.75rem",
+            color: "var(--hud-phosphor-dim)",
             letterSpacing: "0.12em",
-            marginBottom: "0.5rem",
+            marginBottom: "0.6rem",
           }}
         >
           {"> stack"}
         </p>
         <h2
           style={{
-            fontFamily: "var(--font-sg)",
-            fontSize: "clamp(1.1rem, 2.5vw, 1.4rem)",
-            fontWeight: 700,
-            color: "oklch(0.82 0.008 75)",
-            letterSpacing: "0.04em",
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(1.2rem, 2.6vw, 1.5rem)",
+            fontWeight: 600,
+            color: "var(--hud-ink)",
+            letterSpacing: "0.08em",
             textTransform: "uppercase",
           }}
         >
           Technologies
         </h2>
-      </motion.div>
+        {langStats.length > 0 && (
+          <p
+            style={{
+              fontFamily: "var(--font-geist-mono)",
+              fontSize: "0.75rem",
+              color: "var(--hud-ink-3)",
+              letterSpacing: "0.12em",
+              marginTop: "0.8rem",
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            LANG TELEMETRY · {langStats.join(" · ")}
+          </p>
+        )}
+      </header>
 
-      <div>
-        {stacks.map((stack, idx) => (
-          <motion.div
+      <ul className="m-0 list-none p-0">
+        {stacks.map((stack) => (
+          <li
             key={stack.code}
-            initial={{ opacity: 0, x: -10 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.38, delay: idx * 0.05, ease }}
-            className="flex flex-col sm:flex-row sm:items-baseline gap-3 sm:gap-8 py-4"
-            style={{ borderBottom: "1px solid oklch(0.16 0.01 200 / 0.5)" }}
+            className="hud-row grid gap-2 border-b py-5 sm:grid-cols-[4.5rem_9.5rem_1fr] sm:items-baseline sm:gap-6"
+            style={{ borderColor: "var(--hud-line-soft)" }}
           >
             <span
               style={{
                 fontFamily: "var(--font-geist-mono)",
-                fontSize: "0.7rem",
-                color: stack.color,
+                fontSize: "0.75rem",
+                color: "var(--hud-phosphor-dim)",
                 letterSpacing: "0.1em",
-                minWidth: "3.75rem",
-                flexShrink: 0,
               }}
             >
               {stack.code}
             </span>
+            <span
+              style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "0.82rem",
+                fontWeight: 500,
+                color: "var(--hud-ink-2)",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+              }}
+            >
+              {stack.label}
+            </span>
             <p
               style={{
                 fontFamily: "var(--font-geist-mono)",
-                fontSize: "0.78rem",
-                color: "oklch(0.52 0.012 200)",
-                lineHeight: 1.7,
+                fontSize: "0.76rem",
+                color: "var(--hud-ink-3)",
+                lineHeight: 1.75,
               }}
             >
               {stack.skills.join(" · ")}
             </p>
-          </motion.div>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }

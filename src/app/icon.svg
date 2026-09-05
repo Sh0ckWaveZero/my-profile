@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" fill="#071219"/>
+  <g stroke="#00c5b4" stroke-width="4" fill="none">
+    <path d="M4 20 V4 H20"/>
+    <path d="M44 4 H60 V20"/>
+    <path d="M4 44 V60 H20"/>
+    <path d="M60 44 V60 H44"/>
+  </g>
+  <rect x="25" y="25" width="14" height="14" fill="#00c5b4" transform="rotate(45 32 32)"/>
+</svg>
